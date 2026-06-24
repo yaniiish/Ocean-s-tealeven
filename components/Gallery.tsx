@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { gallery, site } from "@/lib/data";
+import { gallery } from "@/lib/data";
 import SectionTitle from "@/components/ui/SectionTitle";
 import Reveal from "@/components/ui/Reveal";
 
@@ -40,8 +40,8 @@ export default function Gallery() {
 
         <Reveal>
           <div className="mt-12 flex justify-center">
-            <a href={site.phoneHref} className="btn-ghost">
-              Réserver une part
+            <a href="#showtimes" className="btn-ghost">
+              Envie de goûter ?
             </a>
           </div>
         </Reveal>
