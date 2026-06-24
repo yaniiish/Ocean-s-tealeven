@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-nuit-900 text-creme-100 font-inter antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-playfair;
+    text-wrap: balance;
+  }
+
+  /* Focus clavier visible partout (accessibilité non négociable). */
+  :focus-visible {
+    outline: 2px solid theme("colors.creme.100");
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: theme("colors.or.500");
+    color: theme("colors.nuit.900");
+  }
+}
+
+@layer components {
+  /* Boutons (cf. DESIGN.md §4). Cibles tactiles >= 44px. */
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-btn px-7 py-3.5 font-inter font-semibold leading-none transition duration-200;
+  }
+  .btn-primary {
+    @apply btn bg-or-500 text-nuit-900 hover:-translate-y-0.5 hover:bg-or-300 hover:shadow-glow-or;
+  }
+  .btn-ghost {
+    @apply btn border border-or-500 bg-transparent text-or-500 hover:bg-or-500 hover:text-nuit-900;
+  }
+
+  /* Lien "Aller au contenu" : masqué jusqu'au focus clavier. */
+  .skip-link {
+    @apply absolute left-4 z-[100] -translate-y-20 rounded-btn bg-or-500 px-4 py-2 font-inter text-sm font-semibold text-nuit-900 transition-transform;
+  }
+  .skip-link:focus {
+    @apply translate-y-4;
+  }
+
+  /* Texture velours du rideau : plis verticaux marqués + léger reflet doré. */
+  .velvet {
+    background-color: theme("colors.nuit.900");
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.55) 0px,
+        rgba(0, 0, 0, 0) 26px,
+        rgba(224, 205, 150, 0.05) 38px,
+        rgba(0, 0, 0, 0) 50px,
+        rgba(0, 0, 0, 0.55) 74px
+      ),
+      linear-gradient(180deg, theme("colors.nuit.800") 0%, theme("colors.nuit.900") 65%);
+    box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.6);
+  }
+
+  /* Clap de cinéma du rideau d'ouverture. */
+  .clap {
+    filter: drop-shadow(0 14px 34px rgba(0, 0, 0, 0.55));
+  }
+  .clap-sticks {
+    position: relative;
+    height: 38px;
+  }
+  .clap-stick {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 38px;
+    border: 1px solid theme("colors.or.700");
+    border-radius: 5px;
+    background-image: repeating-linear-gradient(
+      -45deg,
+      theme("colors.nuit.900") 0 17px,
+      theme("colors.creme.100") 17px 34px
+    );
+  }
+  .clap-stick--fixed {
+    z-index: 1;
+  }
+  .clap-stick--moving {
+    z-index: 2;
+    transform: rotate(-32deg);
+    transform-origin: 0% 100%;
+  }
+  .clap-body {
+    border: 2px solid theme("colors.or.700");
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    background-color: theme("colors.nuit.900");
+    padding: 18px 20px 20px;
+  }
+  .clap-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(168, 136, 74, 0.3);
+    font-family: var(--font-bebas), Impact, sans-serif;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: theme("colors.creme.100");
+  }
+  .clap-row span:last-child {
+    color: theme("colors.or.300");
+  }
+}
+
+/* Reveal au scroll : état initial puis visible (classe ajoutée en JS). */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Marquee : pause au survol et au focus clavier. */
+.marquee-track {
+  width: max-content;
+}
+.marquee-paused .marquee-track,
+.marquee-wrap:hover .marquee-track,
+.marquee-wrap:focus-within .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Reel vertical d'avis (générique cinéma) : pause au survol et au focus clavier. */
+.reel-paused .reel-track,
+.reel-wrap:hover .reel-track,
+.reel-wrap:focus-within .reel-track {
+  animation-play-state: paused;
+}
+
+/* Effet projecteur : overlay lumineux (navbar) suivant le curseur. */
+.spotlight-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: var(--spot-o, 0);
+  background: radial-gradient(
+    260px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+    rgba(201, 176, 116, 0.32),
+    transparent 62%
+  );
+  mix-blend-mode: screen;
+  transition: opacity 0.3s ease;
+}
+
+/* Effet projecteur : titres illuminés par un spot doré au survol.
+   Hors survol : titre normal. Au survol : un dégradé radial centré sur le
+   curseur, découpé sur le texte (background-clip: text). */
+.spotlight-text {
+  --spot-x: 50%;
+  --spot-y: 50%;
+  transition: color 0.25s ease;
+}
+.spotlight-text:hover {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+  background-image: radial-gradient(
+    240px circle at var(--spot-x) var(--spot-y),
+    theme("colors.creme.100") 0%,
+    theme("colors.or.300") 28%,
+    theme("colors.or.500") 60%,
+    theme("colors.or.700") 100%
+  );
+  background-repeat: no-repeat;
+}
+
+/* Respect strict de prefers-reduced-motion : on fige toute l'ambiance. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
